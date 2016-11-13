@@ -46,10 +46,7 @@ class Sprite(object):
             return self.tile_number
         if address == 3:
             return self.get_attributes_and_flags()
-
-        # Making PyPy happy...
-        raise Exception(("Cannot happen: ", address))
-
+        return 1337  # Can't happen, only for RPython
     def set_data(self, y, x, tile_number, flags):
         """
         extracts the sprite data from an oam entry

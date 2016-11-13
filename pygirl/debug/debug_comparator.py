@@ -2,25 +2,24 @@ from pygirl.debug.debug_util import *
 from pygirl import constants
 
 
-class printframe(object):
+class PrintFrame(object):
     open = 0
 
     def __init__(self, text):
-        global DEBUG, open
-        printframe.open = 0
+        global DEBUG
         self.text = text
 
     def __call__(self, f):
         def wrapper(*args, **kwargs):
             global DEBUG
-            shift = "    " * printframe.open
+            shift = "    " * PrintFrame.open
             if DEBUG:
                 print "python:", shift, self.text, "..."
-            printframe.open += 1
+            PrintFrame.open += 1
             val = f(*args, **kwargs)
             if DEBUG:
                 print "python:", shift, self.text, "DONE"
-            printframe.open -= 1
+            PrintFrame.open -= 1
             return val
 
         return wrapper
@@ -28,7 +27,7 @@ class printframe(object):
 
 # -----------------------------------------------------------------------------
 
-class Comparator:
+class Comparator(object):
     def __init__(self, debug_connection):
         self.debug_connection = debug_connection
         self.memory_check_skip = 1
@@ -93,7 +92,7 @@ class GameboyComparator(Comparator):
         self.interrupt_comparator.compare(data["interrupt"])
         self.ram_comparator.compare(data["ram"])
 
-    @printframe("comparing cycles")
+    @PrintFrame("comparing cycles")
     def compare_cycles(self, data):
         cmp = [
             ("video", self.gameboy.video.cycles, "video"),
@@ -115,7 +114,7 @@ class ROMComparator(Comparator):
                                                         self.gameboy.cartridge_manager)
         self.rom = self.gameboy.rom
 
-    @printframe("checking ROM")
+    @PrintFrame("checking ROM")
     def compare(self, data):
         cmp = [
             ("ROM", self.rom, "rom"),
@@ -130,7 +129,7 @@ class CartridgeComparator(Comparator):
         Comparator.__init__(self, debug_connection)
         self.cartridge_manager = cartridge_manager
 
-    @printframe("checking cartridge data")
+    @PrintFrame("checking cartridge data")
     def compare(self, data):
         cmp = [
             ("ROM size",
@@ -153,7 +152,7 @@ class InterruptComparator(Comparator):
         self.cpu = gameboy.cpu
         self.interrupt = gameboy.interrupt
 
-    @printframe("comparing interrupts")
+    @PrintFrame("comparing interrupts")
     def compare(self, data):
         cmp = [
             ("ime", self.cpu.ime, "ime"),
@@ -169,7 +168,7 @@ class CPUComparator(Comparator):
         Comparator.__init__(self, debug_connection)
         self.cpu = cpu
 
-    @printframe("comparing CPU")
+    @PrintFrame("comparing CPU")
     def compare(self, data):
         self.print_compare("instruction count",
                            self.cpu.instruction_counter,
@@ -177,7 +176,7 @@ class CPUComparator(Comparator):
         self.compare_opcodes(data)
         self.compare_registers(data["registers"])
 
-    @printframe("comparing op codes")
+    @PrintFrame("comparing op codes")
     def compare_opcodes(self, data):
         cmp = [
             ("last opCode", self.cpu.last_op_code, "last_op_code"),
@@ -186,7 +185,7 @@ class CPUComparator(Comparator):
         ]
         self.compare_set(cmp, data)
 
-    @printframe("comparing registers")
+    @PrintFrame("comparing registers")
     def compare_registers(self, registers):
         display_results = []
         mapping = [
@@ -224,7 +223,7 @@ class TimerComparator(Comparator):
         Comparator.__init__(self, debug_connection)
         self.timer = timer
 
-    @printframe("comparing timer")
+    @PrintFrame("comparing timer")
     def compare(self, data):
         cmp = [
             ("div", self.timer.divider, "div"),
@@ -243,7 +242,7 @@ class RAMComparator(Comparator):
         Comparator.__init__(self, debug_connection)
         self.gameboy_debug = gameboy_debug
 
-    @printframe("comparing RAM")
+    @PrintFrame("comparing RAM")
     def compare(self, data):
         cmp = [
             ("wram", self.gameboy_debug.ram.work_ram, "wram"),
@@ -265,14 +264,14 @@ class VideoComparator(Comparator):
         Comparator.__init__(self, debug_connection)
         self.video = video
 
-    @printframe("comparing video")
+    @PrintFrame("comparing video")
     def compare(self, data):
         print "Java video-mode:", data["stat"] & 3, "python:", self.video.status.get_mode()
         self.compare_video_memory(data)
         self.compare_registers(data)
         self.compare_other(data)
 
-    @printframe("comparing memory")
+    @PrintFrame("comparing memory")
     def compare_video_memory(self, data):
         cmp = [
             # ("vram",    self.video.vram,    "vram"),
@@ -283,7 +282,7 @@ class VideoComparator(Comparator):
         ]
         self.compare_memory_set(cmp, data, label="video")
 
-    @printframe("comparing registers")
+    @PrintFrame("comparing registers")
     def compare_registers(self, data):
         cmp = [
             ("dirty", self.video.dirty, "dirty"),
@@ -308,7 +307,7 @@ class VideoComparator(Comparator):
         ]
         self.compare_set(cmp, data, label="video")
 
-    @printframe("comparing additional tracked variables")
+    @PrintFrame("comparing additional tracked variables")
     def compare_other(self, data):
         cmp = [
             ("Last Read Address",

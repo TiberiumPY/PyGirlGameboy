@@ -80,6 +80,7 @@ class GameBoy(object):
         self.draw_logo()
 
     def get_cycles(self):
+        # RPython supports only two arguments in min()
         return min(min(min(min(self.video.get_cycles(),
                                self.serial.get_cycles()),
                            self.timer.get_cycles()),
@@ -122,7 +123,7 @@ class GameBoy(object):
 
     def write(self, address, data):
         receiver = self.get_receiver(address)
-        if receiver is not None:
+        if receiver:
             receiver.write(address, data)
         # else:
         #     raise Exception(("invalid write address given: ",address," ",data))
@@ -131,7 +132,7 @@ class GameBoy(object):
 
     def read(self, address):
         receiver = self.get_receiver(address)
-        if receiver is None:
+        if not receiver:
             # raise Exception("invalid read address given: ", address)
             return 0xFF
         return receiver.read(address)

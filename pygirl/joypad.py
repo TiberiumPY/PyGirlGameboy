@@ -140,10 +140,8 @@ class JoypadDriver(object):
         self.release_directions()
 
     def release_buttons(self):
-        self.up.release()
-        self.right.release()
-        self.down.release()
-        self.left.release()
+        for btn in self.buttons:
+            btn.release()
 
     def release_directions(self):
         self.start.release()
@@ -209,7 +207,7 @@ class Button(object):
         self.pressed = False
 
     def press(self):
-        if self.opposite_button is not None:
+        if self.opposite_button:
             self.opposite_button.release()
         self.pressed = True
 

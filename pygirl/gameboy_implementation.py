@@ -13,7 +13,8 @@ from pygirl import constants
 import time
 
 # Extends the window with windows visualizing meta-data
-show_metadata = True
+# WARNING! Window will be very, very big!
+show_metadata = False
 
 if constants.USE_RSDL:
     from rsdl import RSDL, RSDL_helper  # , RMix
