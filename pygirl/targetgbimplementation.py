@@ -3,9 +3,7 @@ import sys
     
 from pygirl.cartridge import CartridgeHeaderCorruptedException, CartridgeTruncatedException
 
-sys.path.append("/home/tiberium/pypy")
-
-import os, py, pdb, sys
+import os, py, pdb
 from gameboy_implementation import GameBoyImplementation
 
 ROM_PATH = str(py.path.local(__file__).dirpath() / "rom")
